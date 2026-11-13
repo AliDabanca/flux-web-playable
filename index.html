@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#141a21">
+  <title>FLUX</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; background: #141a21; }
+    body { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    #game { position: relative; width: min(100vw, 56.25vh); width: min(100vw, 56.25dvh); aspect-ratio: 9 / 16; max-height: 100vh; max-height: 100dvh; }
+    canvas { display: block; width: 100%; height: 100%; background: #141a21; touch-action: none; }
+    #status { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 24px; color: #fff; background: #141a21; font: 16px system-ui, sans-serif; text-align: center; }
+  </style>
+</head>
+<body>
+  <main id="game">
+    <canvas id="unity-canvas" width="720" height="1280" tabindex="-1"></canvas>
+    <div id="status" role="status">Oyun yükleniyor...</div>
+  </main>
+  <script>
+    const canvas = document.getElementById("unity-canvas");
+    const status = document.getElementById("status");
+    const build = "Build";
+    const config = {
+      dataUrl: build + "/WebGL.data",
+      frameworkUrl: build + "/WebGL.framework.js",
+      codeUrl: build + "/WebGL.wasm",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "DefaultCompany",
+      productName: "Flux",
+      productVersion: "1.0",
+      showBanner: (message, type) => {
+        if (type === "error") {
+          status.hidden = false;
+          status.style.display = "flex";
+          status.textContent = message;
+        } else {
+          console.warn(message);
+        }
+      }
+    };
+    const loader = document.createElement("script");
+    loader.src = build + "/WebGL.loader.js";
+    loader.onerror = () => { status.textContent = "Oyun yüklenemedi. İnternet bağlantını kontrol edip tekrar dene."; };
+    loader.onload = () => {
+      createUnityInstance(canvas, config, progress => {
+        status.textContent = "Oyun yükleniyor... %" + Math.round(progress * 100);
+      }).then(() => {
+        status.style.display = "none";
+      }).catch(error => {
+        console.error(error);
+        status.textContent = "Oyun başlatılamadı. Güncel bir mobil tarayıcıyla tekrar dene.";
+      });
+    };
+    document.body.appendChild(loader);
+  </script>
+</body>
+</html>
