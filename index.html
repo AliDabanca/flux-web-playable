@@ -33,9 +33,10 @@
       productVersion: "1.0",
       showBanner: (message, type) => {
         if (type === "error") {
+          console.error(message);
           status.hidden = false;
           status.style.display = "flex";
-          status.textContent = message;
+          status.textContent = "Oyunda bir hata oluştu. Sayfayı yenilemeyi dene.";
         } else {
           console.warn(message);
         }
